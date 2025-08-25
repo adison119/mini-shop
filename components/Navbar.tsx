@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useCartTotals } from "@/stores/cart";
+import { useUI } from "@/stores/ui";
 
 export default function Navbar() {
   const { totalCount } = useCartTotals();
+  const { openCart } = useUI();
 
   return (
     <header className="border-b bg-black">
@@ -14,14 +16,15 @@ export default function Navbar() {
           <li><Link href="/">Home</Link></li>
           <li><Link href="/products">Products</Link></li>
           <li>
-            <Link href="/cart" className="relative inline-flex items-center">
+            <button onClick={openCart} className="relative inline-flex items-center ">
               Cart
               {totalCount > 0 && (
                 <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-black px-1.5 text-[10px] font-semibold text-white">
                   {totalCount}
                 </span>
               )}
-            </Link>
+            </button>
+            
           </li>
         </ul>
       </nav>

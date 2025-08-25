@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 
@@ -8,12 +9,76 @@ type CategoryFilter = "all" | (typeof products)[number]["category"];
 type SortKey = "relevance" | "price-asc" | "price-desc" | "name-asc";
 
 const CATEGORIES: CategoryFilter[] = ["all", "coin", "skin", "giftcard", "other"];
+const SORTS: SortKey[] = ["relevance", "price-asc", "price-desc", "name-asc"];
+
+function isCategory(v: string | null): v is CategoryFilter {
+  return !!v && (CATEGORIES as string[]).includes(v);
+}
+function isSort(v: string | null): v is SortKey {
+  return !!v && (SORTS as string[]).includes(v);
+}
 
 export default function ProductsPage() {
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState<CategoryFilter>("all");
-  const [sort,setSort] = useState<SortKey>("relevance");
+  const search = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
+  // ---- initial state from URL
+  const [q, setQ] = useState<string>(search.get("q") ?? "");
+  const [cat, setCat] = useState<CategoryFilter>(isCategory(search.get("cat")) ? (search.get("cat") as CategoryFilter) : "all");
+  const [sort, setSort] = useState<SortKey>(isSort(search.get("sort")) ? (search.get("sort") as SortKey) : "relevance");
+
+  // ---- keep state in sync when user presses back/forward (URL changes)
+  useEffect(() => {
+    const urlQ = search.get("q") ?? "";
+    const urlCat = isCategory(search.get("cat")) ? (search.get("cat") as CategoryFilter) : "all";
+    const urlSort = isSort(search.get("sort")) ? (search.get("sort") as SortKey) : "relevance";
+
+    // sync only if changed (กัน loop)
+    if (urlQ !== q) setQ(urlQ);
+    if (urlCat !== cat) setCat(urlCat);
+    if (urlSort !== sort) setSort(urlSort);
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ---- helper: write param back to URL
+  const writeParam = (key: string, value: string | null, { removeIfDefault = false } = {}) => {
+    const params = new URLSearchParams(search.toString());
+    const shouldRemove =
+      value === null ||
+      value === "" ||
+      (removeIfDefault && ((key === "cat" && value === "all") || (key === "sort" && value === "relevance")));
+
+    if (shouldRemove) {
+      params.delete(key);
+    } else {
+      params.set(key, value!);
+    }
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  };
+
+  // ---- update URL when cat/sort change (ทันที)
+  useEffect(() => {
+    writeParam("cat", cat, { removeIfDefault: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cat]);
+  useEffect(() => {
+    writeParam("sort", sort, { removeIfDefault: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort]);
+
+  // ---- update URL when q changes (debounce 300ms)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      // เขียนเฉพาะเมื่อค่าจริงใน URL ไม่เท่ากับ state ปัจจุบัน
+      const current = search.get("q") ?? "";
+      if (current !== q) writeParam("q", q);
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
+
+  // ---- filter + sort ตามเดิม
   const filtered = useMemo(() => {
     const keyword = q.trim().toLowerCase();
     return products.filter((p) => {
@@ -26,25 +91,24 @@ export default function ProductsPage() {
     });
   }, [q, cat]);
 
-  const finalList = useMemo(()=>{
+  const finalList = useMemo(() => {
     const arr = filtered.slice();
     switch (sort) {
       case "price-asc":
-        arr.sort((a,b)=> a.price - b.price);
-      break;
+        arr.sort((a, b) => a.price - b.price);
+        break;
       case "price-desc":
-        arr.sort((a,b)=> b.price - a.price);
-      break;
+        arr.sort((a, b) => b.price - a.price);
+        break;
       case "name-asc":
-        arr.sort((a,b)=> a.name.localeCompare(b.name, "th"));
-      break;
+        arr.sort((a, b) => a.name.localeCompare(b.name, "th"));
+        break;
       case "relevance":
       default:
-        // ไม่ต้อง sort - คงลำดับเดิมใน data
         break;
     }
     return arr;
-  },[filtered,sort])
+  }, [filtered, sort]);
 
   return (
     <div>
@@ -64,7 +128,7 @@ export default function ProductsPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="w-full rounded-xl border px-3 py-2 bg-neutral-800"
+            className="w-full rounded-xl border px-3 py-2 bg-neutral-900"
           >
             <option value="relevance">เรียงตามความเกี่ยวข้อง</option>
             <option value="price-asc">ราคาน้อย → มาก</option>
@@ -74,7 +138,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="mb-6 text-sm text-gray-500">พบ {finalList.length} รายการ</div>
+      <div className="mb-2 text-sm text-gray-500">พบ {finalList.length} รายการ</div>
 
       {/* หมวดหมู่ */}
       <div className="mb-6 flex flex-wrap gap-2">
@@ -86,7 +150,7 @@ export default function ProductsPage() {
               onClick={() => setCat(c)}
               className={
                 "rounded-full border px-3 py-1 text-sm " +
-                (active ? "bg-black text-white" : "bg-gray-900 hover:bg-gray-50 hover:text-black")
+                (active ? "bg-black text-white" : "bg-neutral-800 hover:bg-gray-50 hover:text-black")
               }
             >
               {c === "all" ? "ทั้งหมด" : c}

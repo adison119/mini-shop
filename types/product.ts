@@ -5,4 +5,6 @@ export type Product = {
   price: number;
   category: "coin" | "skin" | "giftcard" | "other";
   description?: string;
+  image: string; 
+  imageAlt: string;
 };
