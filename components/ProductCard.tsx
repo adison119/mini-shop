@@ -14,7 +14,7 @@ export default function ProductCard({ p }: { p: Product }) {
         <span className="font-bold">{formatBaht(p.price)}</span>
         <Link
           href={`/products/${p.slug}`}
-          className="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50"
+          className="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50 hover:text-black"
         >
           View
         </Link>
