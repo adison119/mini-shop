@@ -121,14 +121,14 @@ export default function ProductsPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="ค้นหาชื่อสินค้า…"
-            className="w-full rounded-xl border px-3 py-2"
+            className="w-full rounded-xl border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder:text-foreground/60"
           />
         </div>
         <div>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="w-full rounded-xl border px-3 py-2 bg-neutral-900"
+            className="w-full rounded-xl border border-foreground/20 bg-background px-3 py-2 text-foreground"
           >
             <option value="relevance">เรียงตามความเกี่ยวข้อง</option>
             <option value="price-asc">ราคาน้อย → มาก</option>
@@ -138,7 +138,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="mb-2 text-sm text-gray-500">พบ {finalList.length} รายการ</div>
+      <div className="mb-2 text-sm text-foreground/60">พบ {finalList.length} รายการ</div>
 
       {/* หมวดหมู่ */}
       <div className="mb-6 flex flex-wrap gap-2">
@@ -149,8 +149,10 @@ export default function ProductsPage() {
               key={c}
               onClick={() => setCat(c)}
               className={
-                "rounded-full border px-3 py-1 text-sm " +
-                (active ? "bg-black text-white" : "bg-neutral-800 hover:bg-gray-50 hover:text-black")
+                "rounded-full border border-foreground/20 px-3 py-1 text-sm " +
+                (active
+                  ? "bg-foreground text-background"
+                  : "bg-background hover:bg-foreground/10")
               }
             >
               {c === "all" ? "ทั้งหมด" : c}

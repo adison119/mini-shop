@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MiniCartDrawer from "@/components/MiniCartDrawer";
 import Toasts from "@/components/Toasts";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   // ใช้ URL โปรดักชันถ้ามี (เช่นจาก .env) ไม่งั้น fallback เป็น localhost
@@ -40,17 +41,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="th" suppressHydrationWarning>
-      <body className="min-h-dvh bg-gray-50 text-gray-900">
+      <body className="min-h-dvh bg-background text-foreground">
+        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <Navbar />
           <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
           <Footer />
           <MiniCartDrawer />
           <Toasts />
+        </ThemeProvider>
         {/* JSON-LD site-wide */}
-        <script type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-        <script type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} 
+        />
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} 
+        />
       </body>
     </html>
   );

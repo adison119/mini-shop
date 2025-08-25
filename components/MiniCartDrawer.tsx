@@ -26,33 +26,33 @@ export default function MiniCartDrawer() {
     <>
       {/* overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/40"
+        className="fixed inset-0 z-40 bg-foreground/40"
         onClick={closeCart}
         aria-hidden="true"
       />
 
       {/* drawer */}
       <aside
-        className="fixed right-0 top-0 z-50 h-full w-80 max-w-[90vw] bg-black shadow-xl"
+        className="fixed right-0 top-0 z-50 h-full w-80 max-w-[90vw] bg-background text-foreground shadow-xl"
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex h-14 items-center justify-between border-b px-4">
+        <div className="flex h-14 items-center justify-between border-b border-foreground/20 px-4">
           <h2 className="font-semibold">ตะกร้า</h2>
-          <button onClick={closeCart} aria-label="Close" className="text-gray-500 hover:text-black">✕</button>
+          <button onClick={closeCart} aria-label="Close" className="text-foreground/60 hover:text-foreground">✕</button>
         </div>
 
         <div className="flex h-[calc(100%-56px-88px)] flex-col overflow-y-auto p-4">
           {items.length === 0 ? (
-            <p className="text-sm text-gray-600">ยังไม่มีสินค้าในตะกร้า</p>
+            <p className="text-sm text-foreground/60">ยังไม่มีสินค้าในตะกร้า</p>
           ) : (
             <ul className="space-y-3">
               {items.map((it) => (
-                <li key={it.id} className="rounded-xl border p-3">
+                <li key={it.id} className="rounded-xl border border-foreground/20 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="font-medium">{it.name}</div>
-                      <div className="text-sm text-gray-600">{formatBaht(it.price)}</div>
+                      <div className="text-sm text-foreground/60">{formatBaht(it.price)}</div>
                     </div>
                     <button
                       onClick={() => remove(it.id)}
@@ -62,9 +62,9 @@ export default function MiniCartDrawer() {
                     </button>
                   </div>
                   <div className="mt-2 flex items-center gap-2">
-                    <button onClick={() => dec(it.id)} className="h-8 w-8 rounded-lg border">−</button>
+                    <button onClick={() => dec(it.id)} className="h-8 w-8 rounded-lg border border-foreground/20">−</button>
                     <span className="w-8 text-center">{it.qty}</span>
-                    <button onClick={() => inc(it.id)} className="h-8 w-8 rounded-lg border">+</button>
+                    <button onClick={() => inc(it.id)} className="h-8 w-8 rounded-lg border border-foreground/20">+</button>
                     <div className="ml-auto font-semibold">{formatBaht(it.qty * it.price)}</div>
                   </div>
                 </li>
@@ -74,7 +74,7 @@ export default function MiniCartDrawer() {
         </div>
 
         {/* footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t bg-black p-4">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-foreground/20 bg-background p-4">
           <div className="mb-2 flex items-center justify-between text-sm">
             <span>จำนวนทั้งหมด</span>
             <span className="font-medium">{totalCount} ชิ้น</span>
@@ -84,11 +84,15 @@ export default function MiniCartDrawer() {
             <span className="text-lg font-semibold">{formatBaht(totalPrice)}</span>
           </div>
           <div className="flex gap-2">
-            <button onClick={clear} className="flex-1 rounded-xl border px-3 py-2">ล้าง</button>
-            <Link href="/cart" onClick={closeCart} className="flex-1 rounded-xl border px-3 py-2 text-center">
+            <button onClick={clear} className="flex-1 rounded-xl border border-foreground/20 px-3 py-2">ล้าง</button>
+            <Link href="/cart" onClick={closeCart} className="flex-1 rounded-xl border border-foreground/20 px-3 py-2 text-center">
               ดูตะกร้า
             </Link>
-            <Link href="/checkout" onClick={closeCart} className="flex-1 rounded-xl bg-black px-3 py-2 text-center text-white">
+            <Link
+              href="/checkout"
+              onClick={closeCart}
+              className="flex-1 rounded-xl bg-foreground px-3 py-2 text-center text-background"
+            >
               Checkout
             </Link>
           </div>
