@@ -3,9 +3,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { useProducts } from "@/lib/useProducts";
 
-type CategoryFilter = "all" | (typeof products)[number]["category"];
+type CategoryFilter = "all" | "coin" | "skin" | "giftcard" | "other";
 type SortKey = "relevance" | "price-asc" | "price-desc" | "name-asc";
 
 const CATEGORIES: CategoryFilter[] = ["all", "coin", "skin", "giftcard", "other"];
@@ -19,28 +19,29 @@ function isSort(v: string | null): v is SortKey {
 }
 
 export default function ProductsPage() {
+  const source = useProducts();
+
   const search = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  // ---- initial state from URL
   const [q, setQ] = useState<string>(search.get("q") ?? "");
   const [cat, setCat] = useState<CategoryFilter>(isCategory(search.get("cat")) ? (search.get("cat") as CategoryFilter) : "all");
   const [sort, setSort] = useState<SortKey>(isSort(search.get("sort")) ? (search.get("sort") as SortKey) : "relevance");
 
-  // ---- keep state in sync when user presses back/forward (URL changes)
+
   useEffect(() => {
     const urlQ = search.get("q") ?? "";
     const urlCat = isCategory(search.get("cat")) ? (search.get("cat") as CategoryFilter) : "all";
     const urlSort = isSort(search.get("sort")) ? (search.get("sort") as SortKey) : "relevance";
 
-    // sync only if changed (กัน loop)
+
     if (urlQ !== q) setQ(urlQ);
     if (urlCat !== cat) setCat(urlCat);
     if (urlSort !== sort) setSort(urlSort);
-  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search]);
 
-  // ---- helper: write param back to URL
+
   const writeParam = (key: string, value: string | null, { removeIfDefault = false } = {}) => {
     const params = new URLSearchParams(search.toString());
     const shouldRemove =
@@ -81,7 +82,7 @@ export default function ProductsPage() {
   // ---- filter + sort ตามเดิม
   const filtered = useMemo(() => {
     const keyword = q.trim().toLowerCase();
-    return products.filter((p) => {
+    return source.filter((p) => {
       const matchText =
         !keyword ||
         p.name.toLowerCase().includes(keyword) ||
@@ -89,7 +90,7 @@ export default function ProductsPage() {
       const matchCat = cat === "all" || p.category === cat;
       return matchText && matchCat;
     });
-  }, [q, cat]);
+  }, [q, cat,source]);
 
   const finalList = useMemo(() => {
     const arr = filtered.slice();

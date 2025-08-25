@@ -16,8 +16,9 @@ export default function Navbar() {
         <ul className="flex items-center gap-6 text-sm">
           <li><Link href="/">Home</Link></li>
           <li><Link href="/products">Products</Link></li>
+          <li><Link href="/admin/products">Admin</Link></li>
           <li>
-            <button onClick={openCart} className="relative inline-flex items-center">
+            <button onClick={openCart} className="relative inline-flex items-center cursor-pointer">
               Cart
               {totalCount > 0 && (
                 <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[10px] font-semibold text-background">
