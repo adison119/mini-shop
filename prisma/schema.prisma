@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+provider = "mysql"
+url = env("DATABASE_URL")
+}
+
+
+generator client {
+provider = "prisma-client-js"
+}
+
+
+enum Category {
+coin
+skin
+giftcard
+other
+}
+
+
+model Product {
+id String @id @default(cuid())
+slug String @unique
+name String
+price Int // หน่วยเป็นบาท (จำนวนเต็ม)
+category Category
+description String?
+image String
+imageAlt String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}

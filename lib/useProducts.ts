@@ -1,31 +1,23 @@
-// lib/useProducts.ts
 "use client";
-
 import { useEffect, useState } from "react";
 import type { Product } from "@/types/product";
-import { products as defaultProducts } from "@/data/products";
 
-const LS_KEY = "mini-shop-admin-products";
 
 export function useProducts(): Product[] {
-  const [items, setItems] = useState<Product[]>(defaultProducts);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as { state?: { items?: Product[] } } | Product[];
-      // รองรับทั้งรูป persist object และ array ตรงๆ
-      const arr = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray(parsed?.state?.items)
-        ? (parsed.state!.items as Product[])
-        : null;
-      if (arr && arr.length) setItems(arr);
-    } catch {
-      setItems(defaultProducts);
-    }
-  }, []);
-
-  return items;
+const [items, setItems] = useState<Product[]>([]);
+useEffect(() => {
+let active = true;
+(async () => {
+try {
+const res = await fetch("/api/products", { cache: "no-store" });
+if (!res.ok) throw new Error("fail");
+const data = (await res.json()) as Product[];
+if (active) setItems(data);
+} catch {}
+})();
+return () => {
+active = false;
+};
+}, []);
+return items;
 }

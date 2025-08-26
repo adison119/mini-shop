@@ -22,7 +22,7 @@ export default function AdminProductForm({
     slug: initial?.slug ?? "",
     name: initial?.name ?? "",
     price: initial?.price ?? 0,
-    category: (initial?.category as any) ?? "other",
+    category: (initial?.category) ?? "other",
     description: initial?.description ?? "",
     image: initial?.image ?? "/product.svg",
     imageAlt: initial?.imageAlt ?? initial?.name ?? "",
