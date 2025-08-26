@@ -5,5 +5,6 @@ export default function Footer() {
         © {new Date().getFullYear()} Mini Shop — All rights reserved.
       </div>
     </footer>
+    
   );
 }
